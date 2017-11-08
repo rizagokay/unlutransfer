@@ -1,0 +1,182 @@
+<odoo>
+    <data>
+        <!--Stock.Picking Inherit-->
+        <record model="ir.ui.view" id="view_picking_form_unlutransfer">
+            <field name="name">unlutransfer.picking.form</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='picking_type_id']" position="after">
+                    <field name="plate_no"/>
+                </xpath>
+            </field>
+        </record>
+        <!--Stock.PackOperation.Lot Inherit-->
+        <record model="ir.ui.view" id="view_stockpack_form_unlutransfer">
+            <field name="name">unlutransfer.stock.packing.form</field>
+            <field name="model">stock.pack.operation</field>
+            <field name="inherit_id" ref="stock.view_pack_operation_lot_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='pack_lot_ids']/tree/field[@name='qty']" position="after">
+                    <field name="roll_count"/>
+                </xpath>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_stock_history_unlu">
+            <field name="name">unlutransfer.stockvalue.atdate</field>
+            <field name="model">stock.history</field>
+            <field name="inherit_id" ref="stock_account.view_stock_history_report_tree"/>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="roll_count"/>
+                </tree>
+            </field>
+        </record>
+        <!--Stock Pack Operation Inherit-->
+        <record model="ir.ui.view" id="view_stock_pack_operation_unlu">
+            <field name="name">unlutransfer.stockpackoperation.form</field>
+            <field name="model">stock.pack.operation</field>
+            <field name="inherit_id" ref="stock.view_pack_operation_details_form_save"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='qty_to']" position="after">
+                    <group>
+                        <field name="calculate"/>
+                        <field name="width" attrs="{'invisible':[('calculate','=',False)]}"/>
+                        <field name="weight" attrs="{'invisible':[('calculate','=',False)]}"/>
+                        <field name="gross_weight" attrs="{'invisible':[('calculate','=',False)]}"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+        <!--Sale Order Inherit-->
+        <record model="ir.ui.view" id="view_saleorder_form_unlutransfer">
+            <field name="name">unlutransfer.saleorder.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='payment_term_id']" position="after">
+                    <field name="receipt_no"/>
+                </xpath>
+            </field>
+        </record>
+        <!--Product Template Inherit-->
+        <record model="ir.ui.view" id="view_product_form_unlutransfer">
+            <field name="name">unlutransfer.product.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='type']" position="after">
+                    <field name="product_type"/>
+                    <field name="product_spesification"/>
+                    <field name="fiber_content" attrs="{'invisible' : [('product_spesification','!=',2)]}"/>
+                    <field name="standart_material_for_paper" attrs="{'invisible' : [('product_spesification','!=',1)]}"/>
+                </xpath>
+                <xpath expr="//field[@name='tracking']" position="before">
+                    <field name="width"/>
+                </xpath>
+                <xpath expr="/form/sheet/notebook//page[@name='notes']" position="after">
+                    <page string="Fason" name="fasonation" attrs="{'invisible': [('product_type', '!=', '2')]}">
+                        <group>
+                            <field name="customer" attrs="{'required': [('product_type', '=', '2')]}"/>
+                            <field name="textile_description" />
+                            <field name="paper_measurement_type" attrs="{'required': [('product_type', '=', '2')]}"/>
+                            <field name="supplier" attrs="{'required': [('production_type', '=', '2'), ('paper_type','=','1')], 'invisible' : ['|',('production_type','!=','2'),('paper_type','!=','1')]}"/>
+                            <field name="production_type" attrs="{'required': [('product_type', '=', '2')]}"/>
+                            <field name="paper_type" attrs="{'required': [('production_type', '=', '2')], 'invisible' : [('production_type', '!=', '2')]}"/>
+                            <field name="texture_no" attrs="{'required': [('production_type', '=', '2')], 'invisible' : [('production_type', '!=', '2')]}"/>
+                            <field name="variant_no" attrs="{'required': [('production_type', '=', '2')], 'invisible' : [('production_type', '!=', '2')]}"/>
+                            <field name="paper" attrs="{'required': [('production_type', '=', '2'), ('paper_type','=','2')], 'invisible' : ['|',('production_type','!=','2'),('paper_type','!=','2')]}"/>
+                            <field name="foil_paper" attrs="{'required': [('production_type', '=', '3')], 'invisible' : [('production_type', '!=', '3')]}"/>
+                            <field name="recipe_code" attrs="{'required': [('production_type', '=', '3')], 'invisible' : [('production_type', '!=', '3')]}"/>
+                            <field name="pattern_code_sub" attrs="{'required': [('production_type', 'in', ['3','1'])], 'invisible' : [('production_type', 'not in', ['1','3'])]}" domain="[('production_type','=',production_type)]"/>
+                        </group>
+                    </page>
+                    <page string="Satış" name="saleopt" attrs="{'invisible': [('product_type', '!=', '1')]}">
+                        <group>
+                            <field name="sale_customer" attrs="{'required': [('product_type', '=', '1')]}"/>
+                            <field name="sale_supplier" attrs="{'required': [('sale_production_type', '=', '2'), ('sale_paper_type','=','1')], 'invisible' : ['|',('sale_production_type','!=','2'),('sale_paper_type','!=','1')]}"/>
+                            <field name="sale_production_type" attrs="{'required': [('product_type', '=', '1')]}"/>
+                            <field name="textile" attrs="{'required': [('product_type', '=', '1')]}" />
+                            <field name="sale_paper_type" attrs="{'required': [('sale_production_type', '=', '2')], 'invisible' : [('sale_production_type', '!=', '2')]}"/>
+                            <field name="sale_texture_no" attrs="{'required': [('sale_production_type', '=', '2')], 'invisible' : [('sale_production_type', '!=', '2')]}"/>
+                            <field name="sale_variant_no" attrs="{'required': [('sale_production_type', '=', '2')], 'invisible' : [('sale_production_type', '!=', '2')]}"/>
+                            <field name="sale_paper" attrs="{'required': [('sale_production_type', '=', '2'), ('sale_paper_type','=','2')], 'invisible' : ['|',('sale_production_type','!=','2'),('sale_paper_type','!=','2')]}"/>
+                            <field name="sale_foil_paper" attrs="{'required': [('sale_production_type', '=', '3')], 'invisible' : [('sale_production_type', '!=', '3')]}"/>
+                            <field name="sale_recipe_code" attrs="{'required': [('sale_production_type', '=', '3')], 'invisible' : [('sale_production_type', '!=', '3')]}"/>
+                            <field name="sale_pattern_code_sub" attrs="{'required': [('sale_production_type', 'in', ['3','1'])], 'invisible' : [('sale_production_type', 'not in', ['1','3'])]}" domain="[('production_type','=',sale_production_type)]"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+        <!--Vendor Form Inherit-->
+        <record model="ir.ui.view" id="view_supplierinfo_form_unlutransfer">
+            <field name="name">unlutransfer.supplierinfo.form</field>
+            <field name="model">product.supplierinfo</field>
+            <field name="inherit_id" ref="product.product_supplierinfo_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/group/group" position="after">
+                    <group string="Üretici">
+                        <field name="producer"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_unlutransfer_pattern_form">
+            <field name="name">unlutransfer.pattern.form</field>
+            <field name="model">unluransfer.models.pattern</field>
+            <field name="arch" type="xml">
+                <form string="Kalıp Kodu">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="production_type"/>
+                            <field name="production_date"/>
+                            <field name="supplier"/>
+                            <field name="width"/>
+                            <field name="depth"/>
+                            <field name="perimiter"/>
+                            <field name="weight"/>
+                            <field name="revision_date"/>
+                            <field name="revision_comment"/>
+                            <field name="attachment_ids" widget="many2many_binary" />
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <!--Pattern List Action-->
+        <record model="ir.actions.act_window" id="pattern_code_list_action">
+            <field name="name">Kodlar</field>
+            <field name="res_model">unluransfer.models.pattern</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Yeni Kalıp Kodu Ekleyin..                </p>
+            </field>
+        </record>
+        <!--Pattern List-->
+        <record model="ir.ui.view" id="pattern_code_list_view">
+            <field name="name">Kalıp Kodları</field>
+            <field name="model">unluransfer.models.pattern</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="production_type"/>
+                </tree>
+            </field>
+        </record>
+        <!--Res Partner Inherit-->
+        <record model="ir.ui.view" id="view_partner_form_unlutransfer">
+            <field name="name">unlutransfer.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/sheet/notebook//page[@name='sales_purchases']/group//group[2 ]//field[@name='supplier']" position="after">
+                    <field name="is_paper_supplier"/>
+                </xpath>
+            </field>
+        </record>
+        <menuitem id="menu_unlu_patterns" name="Kalıp Kodları" parent="stock.menu_stock_config_settings" action="pattern_code_list_action"/>
+    </data>
+</odoo>
