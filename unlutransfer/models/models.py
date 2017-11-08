@@ -544,7 +544,8 @@ class ProductTemplate(models.Model):
                     main_uom_id = vals["uom_id"]
                     uom = 0
                     productuom = self.env["product.uom"]
-
+                    supplierenv = self.env["product.supplierinfo"]
+                    
                     foundpartner = self.env["res.partner"].search(
                         [('id', '=', vals["sale_customer"])])
                     # Transfer Baskılı Kumaş
@@ -634,7 +635,7 @@ class ProductTemplate(models.Model):
                                             "supplier"]
                                         supplierdata[
                                             "product_tmpl_id"] = createdpaper.product_tmpl_id.id
-
+                                       
                                         supplierenv.create(supplierdata)
 
                                     bomenv = self.env["mrp.bom"]
@@ -688,10 +689,10 @@ class ProductTemplate(models.Model):
                                 foundpapers_sale = productenv.search(
                                     [('id', '=',
                                       int(vals["sale_foil_paper"]))])
-                                if foundpapers > 0:
+                                if len(foundpapers) > 0:
                                     createdpaper = foundpapers[0]
-                                elif foundpapers_sale:
-                                    createdpaper = foundpapers[0]
+                                elif len(foundpapers_sale) > 0:
+                                    createdpaper = foundpapers_sale[0]
 
         if "textile_description" in vals:
             if vals["textile_description"]:
