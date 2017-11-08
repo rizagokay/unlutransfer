@@ -15,7 +15,6 @@ class SuppliferInfo(models.Model):
     producer = fields.Many2one(
         'res.partner',
         'Producer',
-        required=True,
         help="Producer of this product")
 
 
