@@ -97,7 +97,6 @@ class ProductTemplate(models.Model):
 
     textile_description = fields.Char(string="Kumaş Açıklama")
 
-
     @api.onchange('textile_description')
     def _check_textile_change(self):
         if self.textile_description:
@@ -359,6 +358,7 @@ class ProductTemplate(models.Model):
                     vals.update({"name": product_name})
         except Exception as e:
             pass
+
         if "product_type" in vals:
             if vals["product_type"]:
                 if vals["product_type"] == u'2':
@@ -692,6 +692,12 @@ class ProductTemplate(models.Model):
                                     createdpaper = foundpapers[0]
                                 elif foundpapers_sale:
                                     createdpaper = foundpapers[0]
+
+        if "textile_description" in vals:
+            if vals["textile_description"]:
+                textile_description = vals["textile_description"]
+                vals.update({"default_code": textile_description})
+
         createdmainProduct = super(ProductTemplate, self).create(vals)
 
         if "product_type" in vals:
@@ -804,11 +810,18 @@ class ProductTemplate(models.Model):
                                 "product_qty": 1,
                                 "bom_id": createdBOM.id
                             })
+        
         return createdmainProduct
 
     @api.multi
     def write(self, vals):
         # TODO: REFACTOR BOMS :(((
+        for record in self:
+            if "textile_description" in vals:
+                if vals["textile_description"]:
+                    textile_description = vals["textile_description"]
+                    if textile_description != record.default_code:
+                        vals.update({"default_code": textile_description})
         return super(ProductTemplate, self).write(vals)
 
 
