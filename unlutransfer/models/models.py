@@ -545,7 +545,7 @@ class ProductTemplate(models.Model):
                     uom = 0
                     productuom = self.env["product.uom"]
                     supplierenv = self.env["product.supplierinfo"]
-                    
+
                     foundpartner = self.env["res.partner"].search(
                         [('id', '=', vals["sale_customer"])])
                     # Transfer Baskılı Kumaş
@@ -635,7 +635,7 @@ class ProductTemplate(models.Model):
                                             "supplier"]
                                         supplierdata[
                                             "product_tmpl_id"] = createdpaper.product_tmpl_id.id
-                                       
+
                                         supplierenv.create(supplierdata)
 
                                     bomenv = self.env["mrp.bom"]
@@ -811,7 +811,7 @@ class ProductTemplate(models.Model):
                                 "product_qty": 1,
                                 "bom_id": createdBOM.id
                             })
-        
+
         return createdmainProduct
 
     @api.multi
@@ -857,6 +857,40 @@ class Product(models.Model):
             self.name = (self.pattern_code_sub.name if self.pattern_code_sub
                          else '') + "/" + (self.customer.name[:6]
                                            if self.customer else '')
+
+    @api.onchange('sale_paper_type', 'sale_variant_no', 'sale_texture_no',
+                  'sale_customer', 'sale_paper', 'sale_foil_paper',
+                  'sale_recipe_code', 'sale_pattern_code_sub')
+    def check_change_sale(self):
+        if self.sale_production_type == u'2':
+            if self.sale_paper_type:
+                if self.sale_paper_type == u'1':
+                    self.name = (self.sale_texture_no or '') + '-' + (
+                        self.sale_variant_no
+                        or '') + ("/" + self.sale_customer.name
+                                  if self.sale_customer else '/')
+                else:
+                    self.name = (self.sale_texture_no or '') + '-' + (
+                        self.sale_variant_no or '') + (
+                            ("/" + self.sale_paper.width
+                             if self.sale_paper.width else '/[PAPER WIDTH]')
+                            if self.sale_paper else
+                            '') + ("/" + self.sale_customer.name[:6]
+                                   if self.sale_customer else '/')
+        elif self.sale_production_type == u'3':
+            self.name = (self.sale_pattern_code_sub.name
+                         if self.sale_pattern_code_sub else
+                         '') + (self.sale_recipe_code.name
+                                if self.sale_recipe_code else '') + "/" + (
+                                    self.sale_foil_paper.name
+                                    if self.sale_foil_paper else
+                                    '') + "/" + (self.sale_customer.name[:6]
+                                                 if self.sale_customer else '')
+        elif self.sale_production_type == u'1':
+            self.name = (self.sale_pattern_code_sub.name
+                         if self.sale_pattern_code_sub else
+                         '') + "/" + (self.sale_customer.name[:6]
+                                      if self.sale_customer else '')
 
 
 class PaperType(models.Model):
